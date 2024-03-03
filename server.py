@@ -9,12 +9,21 @@ API_URL = "https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-In
 API_KEY = os.environ["API_KEY"]
 headers = {"Authorization": f"Bearer {API_KEY}"}
 
-async def homepage(request):
+async def examplepage(request):
 	payload = {"inputs": "When did Brady win his first chip?"}
 	response = requests.post(API_URL, headers=headers, json=payload)
 	return JSONResponse(response.json()[0])
 
+'''
+Format for the request body should be:
+{"input": "<insert prompt here>"}
+'''
+async def homepage(request):
+	requestJson = await request.json()
+	response = requests.post(API_URL, headers=headers, json=requestJson)
+	return JSONResponse(response.json()[0])
 
 app = Starlette(debug=True, routes=[
-    Route('/', homepage),
+    Route('/', homepage, methods=["POST"]),
+	Route('/test', examplepage),
 ])
